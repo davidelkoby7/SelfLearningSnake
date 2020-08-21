@@ -30,6 +30,8 @@ void repositionApple(sf::RectangleShape& apple, Snake& snake)
 
 int main()
 {
+    bool autoPlay = true;
+
     // Setting up the game
     sf::RenderWindow window(sf::VideoMode(Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT), "SnakeLearning!");
     window.setFramerateLimit(Constants::FPS);
@@ -85,7 +87,10 @@ int main()
         }
 
         // Moving the snake
-        snake.move();
+        if (autoPlay == true)
+            snake.autoMove(apple.getPosition().x, apple.getPosition().y);
+        else
+            snake.move();
 
         // Growing the snake's size if eats the apple
         if (apple.getGlobalBounds().intersects(snake.getHead()->getGlobalBounds()) == true)

@@ -5,14 +5,27 @@ Snake::Snake()
     this->length = 1;
     this->direction = Constants::SNAKE_LEFT;
 
+    // Setting the snake's color
     this->r = GeneralFunctions::RandomInt(0, 255);
     this->g = GeneralFunctions::RandomInt(0, 255);
     this->b = GeneralFunctions::RandomInt(0, 255);
 
+    // Creating the first head node
     sf::RectangleShape* headRec = new sf::RectangleShape(sf::Vector2f(Constants::TILE_SIZE, Constants::TILE_SIZE));
     headRec->setPosition(Constants::SCREEN_WIDTH / 2, Constants::SCREEN_HEIGHT / 2);
     headRec->setFillColor(sf::Color(this->r, this->g, this->b));
     this->nodes.AddItem(headRec);
+
+    // Reseting a neural network for the snake. The network will be made of:
+    // - 6 inputs: dx, dy to apple and allowed distance in each direction without dying
+    // - 5 hidden neurons (1 layer)
+    // - 4 outputs - one for each direction
+    Utils::DynamicArray<int> numOfNeuronsPerLayer;
+    numOfNeuronsPerLayer.AddItem(6);
+    numOfNeuronsPerLayer.AddItem(5);
+    numOfNeuronsPerLayer.AddItem(4);
+    this->neuralNetwork = new NeuralNetwork(numOfNeuronsPerLayer, ActivationFunctions::Sigmoid, ActivationFunctions::SigmoidDerivative);
+    this->neuralNetwork->SaveToFile("snakeNN.nn");
 }
 
 Utils::DynamicArray<sf::RectangleShape*>* Snake::getNodes()
@@ -158,5 +171,51 @@ double Snake::getObstacleDistance(const char& direction)
     }
 
     return minDistance;
+}
+
+void Snake::autoMove(const int& appleX, const int& appleY)
+{
+    sf::RectangleShape* head = this->getHead();
+    float headX = head->getPosition().x;
+    float headY = head->getPosition().y;
+
+    // Building the input layer
+    Utils::DynamicArray<double> inputs(6);
+
+    // First 4 neurons - min distance to obstacles in the 4 directions (and normalizing the value to be between 0 and 1)
+    inputs.SetItem(0, this->getObstacleDistance(Constants::SNAKE_UP) / Constants::SCREEN_HEIGHT);
+    inputs.SetItem(1, this->getObstacleDistance(Constants::SNAKE_DOWN) / Constants::SCREEN_HEIGHT);
+    inputs.SetItem(2, this->getObstacleDistance(Constants::SNAKE_LEFT) / Constants::SCREEN_WIDTH);
+    inputs.SetItem(3, this->getObstacleDistance(Constants::SNAKE_RIGHT) / Constants::SCREEN_WIDTH);
+
+    // Last 2 neurons - dx and dy for the apple's position (and normalizing the value to be between 0 and 1)
+    inputs.SetItem(4, (appleX - headX) / Constants::SCREEN_WIDTH);
+    inputs.SetItem(5, (appleY - headY) / Constants::SCREEN_HEIGHT);
+
+    std::cout << "~~~ Inputs ~~~\n";
+    inputs.Print();
+    std::cout << "~~~ Inputs ~~~\n\n\n";
+
+    // Calculating the next move
+    this->neuralNetwork->SetInputLayer(inputs);
+    this->neuralNetwork->PropagateForward();
+    int mostActiveIndex = this->neuralNetwork->GetMostActiveNeuronIndex();
+
+    std::cout << "Most active index: " << mostActiveIndex << "\n";
+    std::cout << "~~~ Outputs ~~~\n";
+    Utils::DynamicArray<Neuron*>* outputs = this->neuralNetwork->GetOutputLayer();
+    for (size_t i = 0; i < outputs->GetLength(); i++)
+    {
+        std::cout << outputs->GetItem(i)->GetValue() << ", ";
+    }
+    std::cout << "\n~~~ Outputs ~~~\n\n\n";
+
+    // Setting the direction to it and moving
+    this->direction = mostActiveIndex;
+    this->move();
+}
+
+void evolve()
+{
 }
 

@@ -5,6 +5,7 @@
 #include "../Utils/DynamicArray.h"
 #include "../Utils/Constants.h"
 #include "../Utils/GeneralFunctions.cpp"
+#include "../NeuralNetwork/NeuralNetwork.h"
 
 class Snake
 {
@@ -14,6 +15,7 @@ class Snake
         int r, g, b;
         float snakeVX, snakeVY;
         Utils::DynamicArray<sf::RectangleShape*> nodes;
+        NeuralNetwork* neuralNetwork;
     public:
         Snake();
 
@@ -33,6 +35,8 @@ class Snake
 
         // Learning functionallities
         double getObstacleDistance(const char& direction);
+        void autoMove(const int& appleX, const int& appleY);
+        void evolve();
 };
 
 #include "Snake.cpp"

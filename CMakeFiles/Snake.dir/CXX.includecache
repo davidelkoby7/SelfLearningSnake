@@ -6,6 +6,42 @@
 
 #IncludeRegexTransform: 
 
+/home/davidalk/Documents/snake/src/NeuralNetwork/NeuralNetwork.cpp
+NeuralNetwork.h
+/home/davidalk/Documents/snake/src/NeuralNetwork/NeuralNetwork.h
+
+/home/davidalk/Documents/snake/src/NeuralNetwork/NeuralNetwork.h
+../Utils/DynamicArray.h
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.h
+../Utils/ActivationFunctions.h
+/home/davidalk/Documents/snake/src/Utils/ActivationFunctions.h
+../Utils/Constants.h
+/home/davidalk/Documents/snake/src/Utils/Constants.h
+fstream
+-
+Neuron.h
+/home/davidalk/Documents/snake/src/NeuralNetwork/Neuron.h
+NeuralNetwork.cpp
+/home/davidalk/Documents/snake/src/NeuralNetwork/NeuralNetwork.cpp
+
+/home/davidalk/Documents/snake/src/NeuralNetwork/Neuron.cpp
+Neuron.h
+/home/davidalk/Documents/snake/src/NeuralNetwork/Neuron.h
+
+/home/davidalk/Documents/snake/src/NeuralNetwork/Neuron.h
+../Utils/DynamicArray.h
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.h
+../Utils/GeneralFunctions.cpp
+/home/davidalk/Documents/snake/src/Utils/GeneralFunctions.cpp
+Neuron.cpp
+/home/davidalk/Documents/snake/src/NeuralNetwork/Neuron.cpp
+
+/home/davidalk/Documents/snake/src/Utils/ActivationFunctions.h
+bits/stdc++.h
+-
+Constants.h
+/home/davidalk/Documents/snake/src/Utils/Constants.h
+
 /home/davidalk/Documents/snake/src/Utils/Constants.h
 
 /home/davidalk/Documents/snake/src/Utils/DynamicArray.cpp
@@ -57,6 +93,8 @@ SFML/Graphics.hpp
 /home/davidalk/Documents/snake/src/Utils/Constants.h
 ../Utils/GeneralFunctions.cpp
 /home/davidalk/Documents/snake/src/Utils/GeneralFunctions.cpp
+../NeuralNetwork/NeuralNetwork.h
+/home/davidalk/Documents/snake/src/NeuralNetwork/NeuralNetwork.h
 Snake.cpp
 /home/davidalk/Documents/snake/src/snakeObject/Snake.cpp
 
