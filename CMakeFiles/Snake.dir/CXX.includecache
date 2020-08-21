@@ -6,9 +6,39 @@
 
 #IncludeRegexTransform: 
 
+/home/davidalk/Documents/snake/src/Utils/Constants.h
+
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.cpp
+DynamicArray.h
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.h
+
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.h
+iostream
+-
+DynamicArray.cpp
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.cpp
+
 /home/davidalk/Documents/snake/src/main.cpp
 iostream
 -
 SFML/Graphics.hpp
 -
+Utils/Constants.h
+/home/davidalk/Documents/snake/src/Utils/Constants.h
+snakeObject/Snake.h
+/home/davidalk/Documents/snake/src/snakeObject/Snake.h
+
+/home/davidalk/Documents/snake/src/snakeObject/Snake.cpp
+Snake.h
+/home/davidalk/Documents/snake/src/snakeObject/Snake.h
+
+/home/davidalk/Documents/snake/src/snakeObject/Snake.h
+SFML/Graphics.hpp
+-
+../Utils/DynamicArray.h
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.h
+../Utils/Constants.h
+/home/davidalk/Documents/snake/src/Utils/Constants.h
+Snake.cpp
+/home/davidalk/Documents/snake/src/snakeObject/Snake.cpp
 
