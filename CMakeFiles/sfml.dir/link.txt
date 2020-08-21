@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=c++14  -rdynamic CMakeFiles/sfml.dir/src/main.cpp.o  -o sfml   -LSFML_LIBRARY_DIR 

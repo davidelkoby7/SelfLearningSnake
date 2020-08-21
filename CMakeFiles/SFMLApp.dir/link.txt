@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/SFMLApp.dir/src/main.cpp.o  -o SFMLApp   -L/home/davidalk/Documents/sfmlTut/SFML_LIBRARY_DIR  -Wl,-rpath,/home/davidalk/Documents/sfmlTut/SFML_LIBRARY_DIR /usr/lib/x86_64-linux-gnu/libsfml-graphics.so.2.5.1 /usr/lib/x86_64-linux-gnu/libsfml-window.so.2.5.1 /usr/lib/x86_64-linux-gnu/libsfml-system.so.2.5.1 
