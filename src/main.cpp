@@ -26,6 +26,19 @@ int main()
             {
                 window.close();
             }
+
+            // Handling direction changes by the user
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Up)
+                    snake.setDirection(Constants::SNAKE_UP);
+                else if (event.key.code == sf::Keyboard::Down)
+                    snake.setDirection(Constants::SNAKE_DOWN);
+                else if (event.key.code == sf::Keyboard::Left)
+                    snake.setDirection(Constants::SNAKE_LEFT);
+                else if (event.key.code == sf::Keyboard::Right)
+                    snake.setDirection(Constants::SNAKE_RIGHT);
+            }
         }
 
         // Logic handling
