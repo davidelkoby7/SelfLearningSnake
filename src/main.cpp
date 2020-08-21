@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <SFML/Graphics.hpp>
 
 #include "Utils/Constants.h"
@@ -20,6 +21,18 @@ int main()
 
     // Setting up an event handler
     sf::Event event;
+
+    // Setting up the scoreboard and the generation number
+    sf::Font font;
+    if (!font.loadFromFile(Constants::FONT_PATH))
+        std::cout << "Failed to load font!\n";
+
+    // Setting up the info display for score and generation
+    int score = 0;
+    int generation = 1;
+    sf::Text infoText;
+    infoText.setFont(font);
+    infoText.setCharacterSize(Constants::INFO_TEXT_SIZE);
 
     // Creating the snake
     Snake snake;
@@ -86,6 +99,13 @@ int main()
         }
 
         window.draw(apple);
+
+        std::stringstream infoString;
+        score = snake.getLength() - 1;
+        infoString << "Score: " << score << ", Generation: " << generation;
+
+        infoText.setString(infoString.str());
+        window.draw(infoText);
 
         // Display the rendered stuff
         window.display();

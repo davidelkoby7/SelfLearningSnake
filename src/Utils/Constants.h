@@ -4,6 +4,8 @@ namespace Constants
 {
     // General game constants
     static const int FPS = 12;
+    static const char* FONT_PATH = "fonts/Montserrat-SemiBold.otf";
+    static const int INFO_TEXT_SIZE = 20;
 
     // Game sizes constants
     static const int TILE_SIZE = 30;

@@ -31,6 +31,8 @@ DynamicArray.h
 /home/davidalk/Documents/snake/src/main.cpp
 iostream
 -
+sstream
+-
 SFML/Graphics.hpp
 -
 Utils/Constants.h
