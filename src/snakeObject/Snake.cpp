@@ -2,15 +2,16 @@
 
 Snake::Snake()
 {
-    this->headX = Constants::SCREEN_WIDTH / 2;
-    this->headY = Constants::SCREEN_HEIGHT / 2;
-
     this->length = 1;
     this->direction = Constants::SNAKE_LEFT;
 
+    this->r = GeneralFunctions::RandomInt(0, 255);
+    this->g = GeneralFunctions::RandomInt(0, 255);
+    this->b = GeneralFunctions::RandomInt(0, 255);
+
     sf::RectangleShape* headRec = new sf::RectangleShape(sf::Vector2f(Constants::TILE_SIZE, Constants::TILE_SIZE));
     headRec->setPosition(Constants::SCREEN_WIDTH / 2, Constants::SCREEN_HEIGHT / 2);
-    headRec->setFillColor(sf::Color(0, 255, 0));
+    headRec->setFillColor(sf::Color(this->r, this->g, this->b));
     this->nodes.AddItem(headRec);
 }
 
@@ -29,33 +30,80 @@ char Snake::getDirection() const
     return this->direction;
 }
 
-void Snake::move()
+sf::RectangleShape* Snake::getHead()
 {
-    float snakeVX = 0;
-    float snakeVY = 0;
+    return this->nodes.GetItem(this->length - 1);
+}
+
+void Snake::updateVelocity()
+{
+    this->snakeVX = 0;
+    this->snakeVY = 0;
 
     if (this->direction == Constants::SNAKE_UP)
-        snakeVY = -1 * Constants::SNAKE_SPEED;
+        this->snakeVY = -1 * Constants::SNAKE_SPEED;
     else if (this->direction == Constants::SNAKE_DOWN)
-        snakeVY = Constants::SNAKE_SPEED;
+        this->snakeVY = Constants::SNAKE_SPEED;
     else if (this->direction == Constants::SNAKE_LEFT)
-        snakeVX = -1 * Constants::SNAKE_SPEED;
+        this->snakeVX = -1 * Constants::SNAKE_SPEED;
     else if (this->direction == Constants::SNAKE_RIGHT)
-        snakeVX = Constants::SNAKE_SPEED;
+        this->snakeVX = Constants::SNAKE_SPEED;
+}
 
-    for (size_t i = this->getLength(); i > 1; i--)
+void Snake::move()
+{
+    this->updateVelocity();
+
+    for (size_t i = 0; i < this->length - 1; i++)
     {
          sf::RectangleShape* currNode = this->nodes.GetItem(i);
-         sf::RectangleShape* nextNode = this->nodes.GetItem(i - 1);
+         sf::RectangleShape* nextNode = this->nodes.GetItem(i + 1);
          currNode->setPosition(nextNode->getPosition());
     }
 
-    sf::RectangleShape* head = this->nodes.GetItem(0);
+    sf::RectangleShape* head = this->getHead();
     head->setPosition(head->getPosition().x + snakeVX, head->getPosition().y + snakeVY);
 }
 
 void Snake::setDirection(const char& direction)
 {
     this->direction = direction;
+}
+
+void Snake::grow()
+{
+    this->updateVelocity();
+    sf::RectangleShape* head = this->getHead();
+
+    sf::RectangleShape* newNode = new sf::RectangleShape(sf::Vector2f(Constants::TILE_SIZE, Constants::TILE_SIZE));
+    newNode->setFillColor(sf::Color(this->r, this->g, this->b));
+
+    newNode->setPosition(head->getPosition().x + snakeVX, head->getPosition().y + snakeVY);
+    this->nodes.AddItem(newNode);
+    this->length++;
+}
+
+bool Snake::isEatingItself()
+{
+    sf::RectangleShape* head = this->getHead();
+    for (size_t i = 0; i < this->length - 1; i++)
+    {
+        sf::RectangleShape* currNode = this->nodes.GetItem(i);
+        if (currNode->getGlobalBounds().intersects(head->getGlobalBounds()) == true)
+            return true;
+    }
+    return false;
+}
+
+bool Snake::isOutOfBounds()
+{
+    sf::RectangleShape* head = this->getHead();
+    float headX = head->getPosition().x;
+    float headY = head->getPosition().y;
+    if (headX < 0 || headY < 0)
+        return true;
+    if (headX > Constants::SCREEN_WIDTH - Constants::TILE_SIZE || headY > Constants::SCREEN_HEIGHT - Constants::TILE_SIZE)
+        return true;
+    return false;
 }
 

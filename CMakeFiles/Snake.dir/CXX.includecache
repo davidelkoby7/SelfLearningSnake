@@ -18,6 +18,16 @@ iostream
 DynamicArray.cpp
 /home/davidalk/Documents/snake/src/Utils/DynamicArray.cpp
 
+/home/davidalk/Documents/snake/src/Utils/GeneralFunctions.cpp
+stdlib.h
+-
+chrono
+-
+fstream
+-
+DynamicArray.h
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.h
+
 /home/davidalk/Documents/snake/src/main.cpp
 iostream
 -
@@ -25,6 +35,8 @@ SFML/Graphics.hpp
 -
 Utils/Constants.h
 /home/davidalk/Documents/snake/src/Utils/Constants.h
+Utils/GeneralFunctions.cpp
+/home/davidalk/Documents/snake/src/Utils/GeneralFunctions.cpp
 snakeObject/Snake.h
 /home/davidalk/Documents/snake/src/snakeObject/Snake.h
 
@@ -39,6 +51,8 @@ SFML/Graphics.hpp
 /home/davidalk/Documents/snake/src/Utils/DynamicArray.h
 ../Utils/Constants.h
 /home/davidalk/Documents/snake/src/Utils/Constants.h
+../Utils/GeneralFunctions.cpp
+/home/davidalk/Documents/snake/src/Utils/GeneralFunctions.cpp
 Snake.cpp
 /home/davidalk/Documents/snake/src/snakeObject/Snake.cpp
 

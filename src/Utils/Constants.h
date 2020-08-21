@@ -3,12 +3,14 @@
 namespace Constants
 {
     // General game constants
-    static const int FPS = 2;
+    static const int FPS = 12;
 
     // Game sizes constants
-    static const int SCREEN_WIDTH = 1000;
-    static const int SCREEN_HEIGHT = 600;
-    static const int TILE_SIZE = 40;
+    static const int TILE_SIZE = 30;
+    static const int GRID_WIDTH = 30; // Units of tiles
+    static const int GRID_HEIGHT = 18; // Units of tiles
+    static const int SCREEN_WIDTH = TILE_SIZE * GRID_WIDTH;
+    static const int SCREEN_HEIGHT = TILE_SIZE * GRID_HEIGHT;
 
     // Snake constants
     static const float SNAKE_SPEED = TILE_SIZE;

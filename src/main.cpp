@@ -2,13 +2,21 @@
 #include <SFML/Graphics.hpp>
 
 #include "Utils/Constants.h"
+#include "Utils/GeneralFunctions.cpp"
 #include "snakeObject/Snake.h"
+
+void respositionApple(sf::RectangleShape& apple)
+{
+    apple.setPosition(GeneralFunctions::RandomInt(1, Constants::GRID_WIDTH - 2) * Constants::TILE_SIZE, GeneralFunctions::RandomInt(1, Constants::GRID_HEIGHT -2) * Constants::TILE_SIZE);
+}
 
 int main()
 {
-    // Setting up the window
+    // Setting up the game
     sf::RenderWindow window(sf::VideoMode(Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT), "SnakeLearning!");
     window.setFramerateLimit(Constants::FPS);
+
+    bool isPlaying = true;
 
     // Setting up an event handler
     sf::Event event;
@@ -16,7 +24,12 @@ int main()
     // Creating the snake
     Snake snake;
 
-    while (window.isOpen())
+    // Creating the apple and putting him randomly aligned with the grid
+    sf::RectangleShape apple(sf::Vector2f(Constants::TILE_SIZE, Constants::TILE_SIZE));
+    respositionApple(apple);
+    apple.setFillColor(sf::Color(255, 0, 50));
+
+    while (window.isOpen() && isPlaying)
     {
         // Handling events
         while (window.pollEvent(event))
@@ -41,9 +54,23 @@ int main()
             }
         }
 
-        // Logic handling
         // Moving the snake
         snake.move();
+
+        // Growing the snake's size if eats the apple
+        if (apple.getGlobalBounds().intersects(snake.getHead()->getGlobalBounds()) == true)
+        {
+            snake.grow();
+            respositionApple(apple);
+        }
+
+        // Checking for collision of the snake with it's body
+        if (snake.isEatingItself() == true || snake.isOutOfBounds() == true)
+        {
+            isPlaying = false;
+            std::cout << "You lost! your score is " << snake.getLength() << "!\n";
+            break;
+        }
 
         // Clear the old screen
         window.clear(sf::Color(0 ,0, 0));
@@ -57,6 +84,8 @@ int main()
             sf::RectangleShape* currNode = snakeNodes->GetItem(i);
             window.draw(*currNode);
         }
+
+        window.draw(apple);
 
         // Display the rendered stuff
         window.display();

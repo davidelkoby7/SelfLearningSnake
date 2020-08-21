@@ -4,6 +4,7 @@
 CMakeFiles/Snake.dir/src/main.cpp.o: src/Utils/Constants.h
 CMakeFiles/Snake.dir/src/main.cpp.o: src/Utils/DynamicArray.cpp
 CMakeFiles/Snake.dir/src/main.cpp.o: src/Utils/DynamicArray.h
+CMakeFiles/Snake.dir/src/main.cpp.o: src/Utils/GeneralFunctions.cpp
 CMakeFiles/Snake.dir/src/main.cpp.o: src/main.cpp
 CMakeFiles/Snake.dir/src/main.cpp.o: src/snakeObject/Snake.cpp
 CMakeFiles/Snake.dir/src/main.cpp.o: src/snakeObject/Snake.h
