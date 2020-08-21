@@ -39,6 +39,8 @@ Utils/Constants.h
 /home/davidalk/Documents/snake/src/Utils/Constants.h
 Utils/GeneralFunctions.cpp
 /home/davidalk/Documents/snake/src/Utils/GeneralFunctions.cpp
+Utils/DynamicArray.h
+/home/davidalk/Documents/snake/src/Utils/DynamicArray.h
 snakeObject/Snake.h
 /home/davidalk/Documents/snake/src/snakeObject/Snake.h
 
