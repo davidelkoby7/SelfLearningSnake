@@ -30,6 +30,9 @@ class Snake
         void updateVelocity();
         bool isEatingItself();
         bool isOutOfBounds();
+
+        // Learning functionallities
+        double getObstacleDistance(const char& direction);
 };
 
 #include "Snake.cpp"

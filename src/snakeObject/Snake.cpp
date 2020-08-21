@@ -107,3 +107,56 @@ bool Snake::isOutOfBounds()
     return false;
 }
 
+double Snake::getObstacleDistance(const char& direction)
+{
+    int mx, my;
+    float minDistance;
+
+    sf::RectangleShape* head = this->getHead();
+    float headX = head->getPosition().x;
+    float headY = head->getPosition().y;
+
+    // Initializing the min distance to the distance to the walls (worst case scenario)
+    if (direction == Constants::SNAKE_UP)
+    {
+        mx = 0;
+        my = -1;
+        minDistance = headY;
+    }
+    else if (direction == Constants::SNAKE_DOWN)
+    {
+        mx = 0;
+        my = 1;
+        minDistance = Constants::SCREEN_HEIGHT - headY - Constants::TILE_SIZE;
+    }
+    else if (direction == Constants::SNAKE_LEFT)
+    {
+        mx = -1;
+        my = 0;
+        minDistance = headX;
+    }
+    else if (direction == Constants::SNAKE_RIGHT)
+    {
+        mx = 1;
+        my = 0;
+        minDistance = Constants::SCREEN_WIDTH - headX - Constants::TILE_SIZE;
+    }
+
+    // Checking if there is a snake node between the head and the node
+    for (size_t i = 0; i < this->length - 1; i++)
+    {
+        sf::RectangleShape* currNode = this->nodes.GetItem(i);
+        float currNodeX = currNode->getPosition().x;
+        float currNodeY = currNode->getPosition().y;
+
+        if ((currNodeY == headY && mx != 0) || (currNodeX == headX && my != 0))
+        {
+            double currDistance = mx * (currNodeX - headX) + my * (currNodeY- headY) - Constants::TILE_SIZE;
+            if (currDistance < minDistance && currDistance >= 0)
+                minDistance = currDistance;
+        }
+    }
+
+    return minDistance;
+}
+
