@@ -18,14 +18,18 @@ class Snake
         NeuralNetwork* neuralNetwork;
     public:
         Snake();
+        Snake(const char* nnPath);
+        void reset(const char* nnPath);
 
         // Getters
         Utils::DynamicArray<sf::RectangleShape*>* getNodes();
         int getLength() const;
         char getDirection() const;
+        NeuralNetwork* getNN();
         sf::RectangleShape* getHead();
 
         // Snake functionallities
+        void saveNN();
         void move();
         void setDirection(const char& direction);
         void grow();

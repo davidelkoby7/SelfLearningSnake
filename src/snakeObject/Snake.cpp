@@ -2,6 +2,21 @@
 
 Snake::Snake()
 {
+    reset("None");
+}
+
+Snake::Snake(const char* nnPath)
+{
+    reset(nnPath);
+}
+
+void Snake::reset(const char* nnPath)
+{
+    // Removing the older nodes if any
+    size_t nodesLength = nodes.GetLength();
+    for (size_t i = 0; i < nodesLength; i++)
+        nodes.RemoveItem(0);
+
     this->length = 1;
     this->direction = Constants::SNAKE_LEFT;
 
@@ -16,16 +31,23 @@ Snake::Snake()
     headRec->setFillColor(sf::Color(this->r, this->g, this->b));
     this->nodes.AddItem(headRec);
 
-    // Reseting a neural network for the snake. The network will be made of:
-    // - 6 inputs: dx, dy to apple and allowed distance in each direction without dying
-    // - 5 hidden neurons (1 layer)
-    // - 4 outputs - one for each direction
-    Utils::DynamicArray<int> numOfNeuronsPerLayer;
-    numOfNeuronsPerLayer.AddItem(6);
-    numOfNeuronsPerLayer.AddItem(5);
-    numOfNeuronsPerLayer.AddItem(4);
-    this->neuralNetwork = new NeuralNetwork(numOfNeuronsPerLayer, ActivationFunctions::Sigmoid, ActivationFunctions::SigmoidDerivative);
-    this->neuralNetwork->SaveToFile("snakeNN.nn");
+    if (nnPath == "None")
+    {
+        // Reseting a neural network for the snake. The network will be made of:
+        // - 6 inputs: dx, dy to apple and allowed distance in each direction without dying
+        // - 5 hidden neurons (1 layer)
+        // - 4 outputs - one for each direction
+        Utils::DynamicArray<int> numOfNeuronsPerLayer;
+        numOfNeuronsPerLayer.AddItem(6);
+        numOfNeuronsPerLayer.AddItem(16);
+        numOfNeuronsPerLayer.AddItem(16);
+        numOfNeuronsPerLayer.AddItem(4);
+        this->neuralNetwork = new NeuralNetwork(numOfNeuronsPerLayer, ActivationFunctions::LeakyReLU, ActivationFunctions::LeakyReLUDerivative);
+    }
+    else
+    {
+        this->neuralNetwork = new NeuralNetwork(nnPath, ActivationFunctions::LeakyReLU, ActivationFunctions::LeakyReLUDerivative);
+    }
 }
 
 Utils::DynamicArray<sf::RectangleShape*>* Snake::getNodes()
@@ -43,9 +65,19 @@ char Snake::getDirection() const
     return this->direction;
 }
 
+NeuralNetwork* Snake::getNN()
+{
+    return this->neuralNetwork;
+}
+
 sf::RectangleShape* Snake::getHead()
 {
     return this->nodes.GetItem(this->length - 1);
+}
+
+void Snake::saveNN()
+{
+    this->neuralNetwork->SaveToFile("Snake.nn");
 }
 
 void Snake::updateVelocity()
@@ -192,14 +224,15 @@ void Snake::autoMove(const int& appleX, const int& appleY)
     inputs.SetItem(4, (appleX - headX) / Constants::SCREEN_WIDTH);
     inputs.SetItem(5, (appleY - headY) / Constants::SCREEN_HEIGHT);
 
-    std::cout << "~~~ Inputs ~~~\n";
-    inputs.Print();
-    std::cout << "~~~ Inputs ~~~\n\n\n";
-
     // Calculating the next move
     this->neuralNetwork->SetInputLayer(inputs);
     this->neuralNetwork->PropagateForward();
     int mostActiveIndex = this->neuralNetwork->GetMostActiveNeuronIndex();
+
+    /*
+    std::cout << "~~~ Inputs ~~~\n";
+    inputs.Print();
+    std::cout << "~~~ Inputs ~~~\n\n\n";
 
     std::cout << "Most active index: " << mostActiveIndex << "\n";
     std::cout << "~~~ Outputs ~~~\n";
@@ -209,6 +242,7 @@ void Snake::autoMove(const int& appleX, const int& appleY)
         std::cout << outputs->GetItem(i)->GetValue() << ", ";
     }
     std::cout << "\n~~~ Outputs ~~~\n\n\n";
+    */
 
     // Setting the direction to it and moving
     this->direction = mostActiveIndex;

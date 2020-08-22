@@ -6,9 +6,11 @@ namespace Constants
     static const double e = 2.718281828459;
 
     // General game constants
-    static const int FPS = 1;
+    static const int FPS = 5;
     static const char* FONT_PATH = "fonts/Montserrat-SemiBold.otf";
     static const int INFO_TEXT_SIZE = 20;
+    static const int SNAKES_PER_GENERATION = 10000;
+    static const int MAX_TURNS_WITHOUT_EATING = 1000;
 
     // Game sizes constants
     static const int TILE_SIZE = 30;
