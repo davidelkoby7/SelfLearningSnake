@@ -95,6 +95,8 @@ SFML/Graphics.hpp
 /home/davidalk/Documents/snake/src/Utils/GeneralFunctions.cpp
 ../NeuralNetwork/NeuralNetwork.h
 /home/davidalk/Documents/snake/src/NeuralNetwork/NeuralNetwork.h
+../NeuralNetwork/Neuron.h
+/home/davidalk/Documents/snake/src/NeuralNetwork/Neuron.h
 Snake.cpp
 /home/davidalk/Documents/snake/src/snakeObject/Snake.cpp
 

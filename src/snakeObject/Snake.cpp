@@ -10,7 +10,7 @@ Snake::Snake(const char* nnPath)
     reset(nnPath);
 }
 
-void Snake::reset(const char* nnPath)
+void Snake::resetSnakeNodes()
 {
     // Removing the older nodes if any
     size_t nodesLength = nodes.GetLength();
@@ -30,6 +30,11 @@ void Snake::reset(const char* nnPath)
     headRec->setPosition(Constants::SCREEN_WIDTH / 2, Constants::SCREEN_HEIGHT / 2);
     headRec->setFillColor(sf::Color(this->r, this->g, this->b));
     this->nodes.AddItem(headRec);
+}
+
+void Snake::reset(const char* nnPath)
+{
+    this->resetSnakeNodes();
 
     if (nnPath == "None")
     {
@@ -39,8 +44,8 @@ void Snake::reset(const char* nnPath)
         // - 4 outputs - one for each direction
         Utils::DynamicArray<int> numOfNeuronsPerLayer;
         numOfNeuronsPerLayer.AddItem(6);
-        numOfNeuronsPerLayer.AddItem(16);
-        numOfNeuronsPerLayer.AddItem(16);
+        numOfNeuronsPerLayer.AddItem(8);
+        numOfNeuronsPerLayer.AddItem(8);
         numOfNeuronsPerLayer.AddItem(4);
         this->neuralNetwork = new NeuralNetwork(numOfNeuronsPerLayer, ActivationFunctions::LeakyReLU, ActivationFunctions::LeakyReLUDerivative);
     }
@@ -75,9 +80,44 @@ sf::RectangleShape* Snake::getHead()
     return this->nodes.GetItem(this->length - 1);
 }
 
-void Snake::saveNN()
+void Snake::saveNN(const char* path)
 {
-    this->neuralNetwork->SaveToFile("Snake.nn");
+    this->neuralNetwork->SaveToFile(path);
+}
+
+void Snake::setNN(NeuralNetwork* newNN)
+{
+    // Setting the weights
+    Utils::DynamicArray<Utils::DynamicArray<Utils::DynamicArray<double>*>*> weights = this->neuralNetwork->GetWeights();
+
+    size_t numOfLayers = weights.GetLength();
+    for (size_t layer = 0; layer < numOfLayers; layer++)
+    {
+        Utils::DynamicArray<Utils::DynamicArray<double>*>* currLayer = weights.GetItem(layer);
+        size_t currLayerLength = currLayer->GetLength();
+        for (size_t src_neuron = 0; src_neuron < currLayerLength; src_neuron++)
+        {
+            Utils::DynamicArray<double>* currWeights = currLayer->GetItem(src_neuron);
+            size_t currWeightsLength = currWeights->GetLength();
+            for (size_t dst_neuron = 0; dst_neuron < currWeightsLength; dst_neuron++)
+                this->neuralNetwork->SetWeight(layer, src_neuron, dst_neuron, newNN->GetWeight(layer, src_neuron, dst_neuron));
+        }
+    }
+
+    // Setting the biases
+    Utils::DynamicArray<Utils::DynamicArray<Neuron*>*> layers = this->neuralNetwork->GetLayers();
+    numOfLayers = layers.GetLength();
+    for (size_t layer = 0; layer < numOfLayers; layer++)
+    {
+        Utils::DynamicArray<Neuron*>* currLayer = layers.GetItem(layer);
+        size_t currLayerLength = currLayer->GetLength();
+        for (size_t curr_neuron = 0; curr_neuron < currLayerLength; curr_neuron++)
+        {
+            Neuron* currNeuron = currLayer->GetItem(curr_neuron);
+            double newBias = newNN->GetNeuronBias(layer, curr_neuron);
+            currNeuron->SetBias(newBias);
+        }
+    }
 }
 
 void Snake::updateVelocity()
@@ -249,7 +289,49 @@ void Snake::autoMove(const int& appleX, const int& appleY)
     this->move();
 }
 
-void evolve()
+void Snake::mutate()
 {
+    // Mutating the weights
+    Utils::DynamicArray<Utils::DynamicArray<Utils::DynamicArray<double>*>*> weights = this->neuralNetwork->GetWeights();
+
+    size_t numOfLayers = weights.GetLength();
+    for (size_t layer = 0; layer < numOfLayers; layer++)
+    {
+        Utils::DynamicArray<Utils::DynamicArray<double>*>* currLayer = weights.GetItem(layer);
+        size_t currLayerLength = currLayer->GetLength();
+        for (size_t src_neuron = 0; src_neuron < currLayerLength; src_neuron++)
+        {
+            Utils::DynamicArray<double>* currWeights = currLayer->GetItem(src_neuron);
+            size_t currWeightsLength = currWeights->GetLength();
+            for (size_t dst_neuron = 0; dst_neuron < currWeightsLength; dst_neuron++)
+            {
+                double randValue = GeneralFunctions::RandomDouble(0, 1);
+                if (randValue <= Constants::CHANCE_OF_MUTATING_PROPERTY)
+                {
+                    double newWeight = GeneralFunctions::RandomDouble(-1, 1);
+                    currWeights->SetItem(dst_neuron, newWeight);
+                }
+            }
+        }
+    }
+
+    // Mutating the biases
+    Utils::DynamicArray<Utils::DynamicArray<Neuron*>*> layers = this->neuralNetwork->GetLayers();
+    numOfLayers = layers.GetLength();
+    for (size_t layer = 0; layer < numOfLayers; layer++)
+    {
+        Utils::DynamicArray<Neuron*>* currLayer = layers.GetItem(layer);
+        size_t currLayerLength = currLayer->GetLength();
+        for (size_t curr_neuron = 0; curr_neuron < currLayerLength; curr_neuron++)
+        {
+            Neuron* currNeuron = currLayer->GetItem(curr_neuron);
+            double randValue = GeneralFunctions::RandomDouble(0, 1);
+            if (randValue <= Constants::CHANCE_OF_MUTATING_PROPERTY)
+            {
+                double newBias = GeneralFunctions::RandomDouble(-1, 1);
+                currNeuron->SetBias(newBias);
+            }
+        }
+    }
 }
 

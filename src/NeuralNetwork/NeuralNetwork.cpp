@@ -151,9 +151,20 @@ double NeuralNetwork::GetWeight(const int& layer_num, const int& src_neuron_numb
     return this->weights[layer_num]->GetItem(src_neuron_number)->GetItem(dst_neuron_number);
 }
 
+double NeuralNetwork::GetNeuronBias(const int& layer_num, const int& neuron_number)
+{
+    return this->layers.GetItem(layer_num)->GetItem(neuron_number)->GetBias();
+}
+
 double NeuralNetwork::GetLearningRate()
 {
     return this->learningRate;
+}
+
+void NeuralNetwork::SetWeight(const int& layer_num, const int& src_neuron_number, const int& dst_neuron_number, const double newValue)
+{
+    double& currentWeight = this->weights[layer_num]->GetItem(src_neuron_number)->GetItem(dst_neuron_number);
+    currentWeight = newValue;
 }
 
 void NeuralNetwork::SetInputLayer(const Utils::DynamicArray<double>& inputs)

@@ -6,6 +6,7 @@
 #include "../Utils/Constants.h"
 #include "../Utils/GeneralFunctions.cpp"
 #include "../NeuralNetwork/NeuralNetwork.h"
+#include "../NeuralNetwork/Neuron.h"
 
 class Snake
 {
@@ -19,6 +20,7 @@ class Snake
     public:
         Snake();
         Snake(const char* nnPath);
+        void resetSnakeNodes();
         void reset(const char* nnPath);
 
         // Getters
@@ -29,7 +31,8 @@ class Snake
         sf::RectangleShape* getHead();
 
         // Snake functionallities
-        void saveNN();
+        void saveNN(const char* path = "Snake.nn");
+        void setNN(NeuralNetwork* newNN);
         void move();
         void setDirection(const char& direction);
         void grow();
@@ -40,7 +43,7 @@ class Snake
         // Learning functionallities
         double getObstacleDistance(const char& direction);
         void autoMove(const int& appleX, const int& appleY);
-        void evolve();
+        void mutate();
 };
 
 #include "Snake.cpp"

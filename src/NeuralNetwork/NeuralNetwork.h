@@ -34,9 +34,11 @@ class NeuralNetwork
         Utils::DynamicArray<Neuron*>* GetInputLayer() const;
         Utils::DynamicArray<Neuron*>* GetOutputLayer() const;
         double GetWeight(const int& layer_num, const int& src_neuron_number, const int& dst_neuron_number);
+        double GetNeuronBias(const int& layer_num, const int& neuron_number);
         double GetLearningRate();
         
         // Setters
+        void SetWeight(const int& layer_num, const int& src_neuron_number, const int& dst_neuron_number, const double newValue);
         void SetInputLayer(const Utils::DynamicArray<double>& inputs);
         void SetLearningRate(const double& newLeariningRate);
 
