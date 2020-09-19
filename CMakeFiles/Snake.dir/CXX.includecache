@@ -61,6 +61,8 @@ chrono
 -
 fstream
 -
+math.h
+-
 DynamicArray.h
 /home/davidalk/Documents/snake/src/Utils/DynamicArray.h
 

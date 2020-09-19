@@ -7,15 +7,16 @@ namespace Constants
 
     // General game constants
     static const int FPS = 15000;
+    static const int PLAY_FPS = 10;
     static const char* FONT_PATH = "fonts/Montserrat-SemiBold.otf";
     static const int INFO_TEXT_SIZE = 20;
     static const int MAX_TURNS_WITHOUT_EATING = 100;
 
     // Genetic algorithm constants
     static const int NUM_OF_GENERATION = 30;
-    static const int SNAKES_PER_GENERATION = 10000;
-    static const float SURVIVING_PERCENTAGE_PER_GENERATION = 0.001f;
-    static const float RANDOM_SNAKES_PRECENTAGE_PER_GENERATION = 0.00f;
+    static const int SNAKES_PER_GENERATION = 1000;
+    static const float SURVIVING_PERCENTAGE_PER_GENERATION = 0.05f;
+    static const float RANDOM_SNAKES_PRECENTAGE_PER_GENERATION = 0.05f;
     static const int SURVIVING_SNAKES_PER_GENERATION = static_cast<int>(SNAKES_PER_GENERATION * SURVIVING_PERCENTAGE_PER_GENERATION);
     static const int RANDOM_SNAKES_PER_GENERATION = static_cast<int>(SNAKES_PER_GENERATION * RANDOM_SNAKES_PRECENTAGE_PER_GENERATION);
     static const float CHANCE_OF_MUTATING_PROPERTY = 0.1f;

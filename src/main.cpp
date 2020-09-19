@@ -7,7 +7,7 @@
 #include "Utils/DynamicArray.h"
 #include "snakeObject/Snake.h"
 
-void handleEvents(sf::Event& event, Snake& snake, sf::RenderWindow& window)
+void handleEvents(sf::Event& event, Snake& snake, sf::RenderWindow& window, int& currentFPS)
 {
     // Handling window closing
     if (event.type == sf::Event::Closed)
@@ -26,6 +26,11 @@ void handleEvents(sf::Event& event, Snake& snake, sf::RenderWindow& window)
             snake.setDirection(Constants::SNAKE_LEFT);
         else if (event.key.code == sf::Keyboard::Right)
             snake.setDirection(Constants::SNAKE_RIGHT);
+        else if (event.key.code == sf::Keyboard::Space)
+        {
+            currentFPS = (Constants::FPS + Constants::PLAY_FPS) - currentFPS;
+            window.setFramerateLimit(currentFPS);
+        }
     }
 }
 
@@ -77,17 +82,17 @@ void repositionApple(sf::RectangleShape& apple, Snake& snake)
     }
 }
 
-void resetGame(Snake& currSnake, int score, Utils::DynamicArray<int>& bestSnakesIndecies, size_t& worseBestSnakeIndex, int& worseBestSnakeScore, int& biggestGenScore, size_t& biggestGenScoreIndex, size_t& snakeIndex, Utils::DynamicArray<float>& scores, int& genScoreSum, int& turnsLived, int& turnsWithoutEating, bool& isPlaying)
+void resetGame(Snake& currSnake, int score, Utils::DynamicArray<int>& bestSnakesIndecies, size_t& worseBestSnakeIndex, float& worseBestSnakeScore, int& biggestGenScore, size_t& biggestGenScoreIndex, size_t& snakeIndex, Utils::DynamicArray<float>& scores, int& genScoreSum, int& turnsLived, int& turnsWithoutEating, bool& isPlaying)
 {
     genScoreSum += score;
 
-    if (score > biggestGenScore)
+    if ((score >= biggestGenScore && score > 1) || score > biggestGenScore)
     {
         std::cout << "New highscore! score: " << score << "\n";
         biggestGenScore = score;
         biggestGenScoreIndex = snakeIndex;
     }
-    double fitness = score + static_cast<double>(turnsLived) * Constants::TURNS_FITNESS_VALUE;
+    float fitness = score + static_cast<float>(turnsLived) * Constants::TURNS_FITNESS_VALUE;
     fitness -= 1 * (turnsWithoutEating > Constants::MAX_TURNS_WITHOUT_EATING);
 
     scores.SetItem(snakeIndex, fitness);
@@ -98,39 +103,47 @@ void resetGame(Snake& currSnake, int score, Utils::DynamicArray<int>& bestSnakes
     if (bestSnakesIndecies.GetLength() < Constants::SURVIVING_SNAKES_PER_GENERATION)
     {
         bestSnakesIndecies.AddItem(snakeIndex);
-        if (worseBestSnakeIndex == 0)
-            worseBestSnakeScore = score;
+        if (snakeIndex == 0)
+        {
+            worseBestSnakeScore = fitness;
+            worseBestSnakeIndex = 0;
+        }
         // If the snake scored less then all - set him to the worst snake
-        if (worseBestSnakeScore > score)
+        else if (worseBestSnakeScore > fitness)
         {
             worseBestSnakeIndex = snakeIndex;
-            worseBestSnakeScore = score;
+            worseBestSnakeScore = fitness;
         }
     }
 
     // After the first N snakes - check if the score is higher than the lowest scoring and if so - replace it and look for the next worse scoring in the best scoring snakes array
-    else if (score > worseBestSnakeScore)
+    else if (fitness > worseBestSnakeScore)
     {
         bestSnakesIndecies.SetItem(worseBestSnakeIndex, snakeIndex);
-        worseBestSnakeScore = int(score);
+        worseBestSnakeScore = fitness;
+        worseBestSnakeIndex = worseBestSnakeIndex;
         size_t bestSnakesLength = bestSnakesIndecies.GetLength();
         for (size_t i = 0; i < bestSnakesLength; i++)
         {
             size_t currScoreIndex = bestSnakesIndecies.GetItem(i);
-            int currScore = scores.GetItem(currScoreIndex);
+            float currScore = scores.GetItem(currScoreIndex);
             if (currScore < worseBestSnakeScore)
             {
-                worseBestSnakeIndex = currScoreIndex;
+                worseBestSnakeIndex = i;
                 worseBestSnakeScore = currScore;
             }
         }
     }
 }
 
-void createNewGeneration(Utils::DynamicArray<Snake>& snakes, Utils::DynamicArray<int>& bestSnakesIndecies)
+void createNewGeneration(Utils::DynamicArray<Snake>& snakes, Utils::DynamicArray<int>& bestSnakesIndecies, Utils::DynamicArray<float>& scores)
 {
     Utils::DynamicArray<Snake> newSnakesArray(snakes.GetLength());
     int duplicationFactor = (1.0f - Constants::RANDOM_SNAKES_PRECENTAGE_PER_GENERATION) / Constants::SURVIVING_PERCENTAGE_PER_GENERATION;
+    std::cout << "~~~~~ Best Snakes Indecies: ~~~~~ \n";
+    for (size_t i = 0; i < bestSnakesIndecies.GetLength(); i++)
+        std::cout << "Index: " << i << " bestSnakesIndecies: " << bestSnakesIndecies.GetItem(i) << ", Score: " << scores.GetItem(bestSnakesIndecies.GetItem(i)) << "\n";
+    std::cout << "~~~~~ Best Snakes Indecies: ~~~~~ \n";
     std::cout << "duplicationFactor: " << duplicationFactor << "\n";
 
     // Copying the best snakes to the newSnakesArray and duplicating them (keeping enough random snakes as defined in Constants.h)
@@ -138,12 +151,9 @@ void createNewGeneration(Utils::DynamicArray<Snake>& snakes, Utils::DynamicArray
         for (size_t j = 0; j < duplicationFactor; j++)
             newSnakesArray.GetItem(i * duplicationFactor + j).setNN(snakes.GetItem(bestSnakesIndecies.GetItem(i)).getNN());
 
-    // Mutating all the snakes and resetting them
+    // Mutating all the snakes
     for (size_t i = 0; i < newSnakesArray.GetLength(); i++)
-    {
         newSnakesArray.GetItem(i).mutate();
-        newSnakesArray.GetItem(i).resetSnakeNodes();
-    }
 
     snakes = newSnakesArray;
 }
@@ -155,7 +165,8 @@ int main()
 
     // Setting up the game
     sf::RenderWindow window(sf::VideoMode(Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT), "SnakeLearning!");
-    window.setFramerateLimit(Constants::FPS);
+    int currentFPS = Constants::FPS;
+    window.setFramerateLimit(currentFPS);
 
     // Setting up an event handler
     sf::Event event;
@@ -183,7 +194,7 @@ int main()
     {
         Utils::DynamicArray<int> bestSnakesIndecies;
         size_t worseBestSnakeIndex = 0;
-        int worseBestSnakeScore = 0;
+        float worseBestSnakeScore = 0;
 
         Utils::DynamicArray<float> scores(snakesLen);
         size_t biggestGenScoreIndex = 0;
@@ -222,7 +233,7 @@ int main()
             {
                 // Handling events
                 while (window.pollEvent(event))
-                    handleEvents(event, snake, window);
+                    handleEvents(event, snake, window, currentFPS);
 
                 // Moving the snake
                 if (geneticLearning == true || bestSnakeAutoPlay)
@@ -256,7 +267,7 @@ int main()
 
         // Regenerating new snakes from the best scoring ones and starting a new generation
         if (generation != numOfGenerations)
-            createNewGeneration(snakes,  bestSnakesIndecies);
+            createNewGeneration(snakes,  bestSnakesIndecies, scores);
 
         if (generation == numOfGenerations)
             snakes.GetItem(biggestGenScoreIndex).saveNN("bestScorer.nn");

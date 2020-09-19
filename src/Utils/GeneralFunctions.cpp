@@ -3,11 +3,27 @@
 #include <stdlib.h>
 #include <chrono>
 #include <fstream>
+#include <math.h> // pow, sqrt
 
 #include "DynamicArray.h"
 
 namespace GeneralFunctions
 {
+    double Power(const double& num, const double& power)
+    {
+        return pow(num, power);
+    }
+
+    double Square(const double& num)
+    {
+        return Power(num, 2);
+    }
+
+    double SquareRoot(const double& num)
+    {
+        return sqrt(num);
+    }
+
     char* ReadBinaryFile(const char* path)
     {
         std::streampos size;

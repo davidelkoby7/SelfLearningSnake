@@ -43,9 +43,9 @@ void Snake::reset(const char* nnPath)
         // - 5 hidden neurons (1 layer)
         // - 4 outputs - one for each direction
         Utils::DynamicArray<int> numOfNeuronsPerLayer;
-        numOfNeuronsPerLayer.AddItem(6);
-        numOfNeuronsPerLayer.AddItem(8);
-        numOfNeuronsPerLayer.AddItem(8);
+        numOfNeuronsPerLayer.AddItem(12);
+        numOfNeuronsPerLayer.AddItem(10);
+        numOfNeuronsPerLayer.AddItem(10);
         numOfNeuronsPerLayer.AddItem(4);
         this->neuralNetwork = new NeuralNetwork(numOfNeuronsPerLayer, ActivationFunctions::LeakyReLU, ActivationFunctions::LeakyReLUDerivative);
     }
@@ -192,39 +192,58 @@ bool Snake::isOutOfBounds()
     return false;
 }
 
-double Snake::getObstacleDistance(const char& direction)
+double Snake::getDistanceToWalls(const char& direction)
 {
-    int mx, my;
-    float minDistance;
-
     sf::RectangleShape* head = this->getHead();
     float headX = head->getPosition().x;
     float headY = head->getPosition().y;
 
     // Initializing the min distance to the distance to the walls (worst case scenario)
     if (direction == Constants::SNAKE_UP)
+        return headY - Constants::TILE_SIZE;
+    else if (direction == Constants::SNAKE_DOWN)
+        return (Constants::SCREEN_HEIGHT - headY);
+    else if (direction == Constants::SNAKE_LEFT)
+        return headX - Constants::TILE_SIZE;
+    else if (direction == Constants::SNAKE_RIGHT)
+        return (Constants::SCREEN_WIDTH - headX);
+}
+
+double Snake::getDistanceToTail(const char& direction)
+{
+    int mx, my;
+
+    sf::RectangleShape* head = this->getHead();
+    float headX = head->getPosition().x;
+    float headY = head->getPosition().y;
+
+    // Setting the min distance to something clearly more than possible
+    float minDistance = Constants::SCREEN_WIDTH * 2;
+
+    // Initializing the min distance to the distance to the walls (worst case scenario)
+    if (direction == Constants::SNAKE_UP)
     {
         mx = 0;
         my = -1;
-        minDistance = headY;
+        headY -= Constants::TILE_SIZE;
     }
     else if (direction == Constants::SNAKE_DOWN)
     {
         mx = 0;
         my = 1;
-        minDistance = Constants::SCREEN_HEIGHT - headY - Constants::TILE_SIZE;
+        headY += Constants::TILE_SIZE;
     }
     else if (direction == Constants::SNAKE_LEFT)
     {
         mx = -1;
         my = 0;
-        minDistance = headX;
+        headX -= Constants::TILE_SIZE;
     }
     else if (direction == Constants::SNAKE_RIGHT)
     {
         mx = 1;
         my = 0;
-        minDistance = Constants::SCREEN_WIDTH - headX - Constants::TILE_SIZE;
+        headX += Constants::TILE_SIZE;
     }
 
     // Checking if there is a snake node between the head and the node
@@ -234,6 +253,7 @@ double Snake::getObstacleDistance(const char& direction)
         float currNodeX = currNode->getPosition().x;
         float currNodeY = currNode->getPosition().y;
 
+        // Is the curr snake in the same relevant axis as we check
         if ((currNodeY == headY && mx != 0) || (currNodeX == headX && my != 0))
         {
             double currDistance = mx * (currNodeX - headX) + my * (currNodeY- headY) - Constants::TILE_SIZE;
@@ -245,6 +265,26 @@ double Snake::getObstacleDistance(const char& direction)
     return minDistance;
 }
 
+double Snake::getDistanceToApple(const char& direction, const int& appleX, const int& appleY)
+{
+    sf::RectangleShape* head = this->getHead();
+    float headX = head->getPosition().x;
+    float headY = head->getPosition().y;
+
+    // Initializing the min distance to the distance to the walls (worst case scenario)
+    if (direction == Constants::SNAKE_UP)
+        headY -= Constants::TILE_SIZE;
+    else if (direction == Constants::SNAKE_DOWN)
+        headY += Constants::TILE_SIZE;
+    else if (direction == Constants::SNAKE_LEFT)
+        headX -= Constants::TILE_SIZE;
+    else if (direction == Constants::SNAKE_RIGHT)
+        headX += Constants::TILE_SIZE;
+
+    double distance = GeneralFunctions::SquareRoot(GeneralFunctions::Square(headY - appleY) + GeneralFunctions::Square(headX - appleX));
+    return distance;
+}
+
 void Snake::autoMove(const int& appleX, const int& appleY)
 {
     sf::RectangleShape* head = this->getHead();
@@ -252,17 +292,15 @@ void Snake::autoMove(const int& appleX, const int& appleY)
     float headY = head->getPosition().y;
 
     // Building the input layer
-    Utils::DynamicArray<double> inputs(6);
+    Utils::DynamicArray<double> inputs(12);
 
-    // First 4 neurons - min distance to obstacles in the 4 directions (and normalizing the value to be between 0 and 1)
-    inputs.SetItem(0, this->getObstacleDistance(Constants::SNAKE_UP) / Constants::SCREEN_HEIGHT);
-    inputs.SetItem(1, this->getObstacleDistance(Constants::SNAKE_DOWN) / Constants::SCREEN_HEIGHT);
-    inputs.SetItem(2, this->getObstacleDistance(Constants::SNAKE_LEFT) / Constants::SCREEN_WIDTH);
-    inputs.SetItem(3, this->getObstacleDistance(Constants::SNAKE_RIGHT) / Constants::SCREEN_WIDTH);
-
-    // Last 2 neurons - dx and dy for the apple's position (and normalizing the value to be between 0 and 1)
-    inputs.SetItem(4, (appleX - headX) / Constants::SCREEN_WIDTH);
-    inputs.SetItem(5, (appleY - headY) / Constants::SCREEN_HEIGHT);
+    // Setting the inputs for each of the 4 directions
+    for (char direction = 0; direction < 4; direction++)
+    {
+        inputs.SetItem(direction * 3, this->getDistanceToWalls(direction));
+        inputs.SetItem(direction  * 3 + 1, this->getDistanceToTail(direction));
+        inputs.SetItem(direction  * 3 + 2, this->getDistanceToApple(direction, appleX, appleY));
+    }
 
     // Calculating the next move
     this->neuralNetwork->SetInputLayer(inputs);

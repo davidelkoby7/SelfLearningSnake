@@ -41,7 +41,9 @@ class Snake
         bool isOutOfBounds();
 
         // Learning functionallities
-        double getObstacleDistance(const char& direction);
+        double getDistanceToWalls(const char& direction);
+        double getDistanceToTail(const char& direction);
+        double getDistanceToApple(const char& direction, const int& appleX, const int& appleY);
         void autoMove(const int& appleX, const int& appleY);
         void mutate();
 };
